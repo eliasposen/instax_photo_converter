@@ -6,6 +6,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+from advanced_print import AdvancedPrint
+
+
+def exit_script(msg: str, code: int = 1):
+    AdvancedPrint.red(msg)
+    exit(code)
 
 def default_csv() -> List[List[str]]:
     return [
@@ -38,22 +44,26 @@ def copy_and_rename_photo(file: Path, filename: str, output: Path) -> None:
 
 def convert(num: int, source: Path, output: Path) -> None:
     if not output.exists():
-        print(f"{output} does not exist... creating")
+        AdvancedPrint.underline(output.absolute(), end="")
+        print(f" does not exit{'.'*20}", end="")
         output.mkdir()
+        AdvancedPrint.blue("CREATED")
     files = list(source.glob("*.jpg"))
-    print(f"Found {len(files)} files to convert")
+    AdvancedPrint.bold(f"\nFound {len(files)} file(s) to convert")
     for idx, file in enumerate(files):
-        print(f"\tConverting file {idx+1}/{len(files)}")
+        print(f"\tConverting file {idx+1}/{len(files)}{'.'*20}", end="")
         filename = f"DSCF{num + idx:04d}"
         copy_and_rename_photo(file, filename, output)
         make_csv(filename, output)
-    print(f"Converted files saved in {output.absolute()}")
+        AdvancedPrint.green("DONE")
+    print("\nConverted files saved in", end="")
+    AdvancedPrint.underline(output.absolute())
 
 
 def validate_args(args: Namespace) -> str:
     msg = ""
     if args.start_number > 9999:
-        msg = "--start_number can have maximum 4 digits"
+        msg = "--start_number (-n) can have maximum 4 digits"
     return msg
 
 
@@ -74,6 +84,6 @@ if "__main__" == __name__:
 
     error_msg = validate_args(args)
     if error_msg:
-        raise TypeError(error_msg)
+        exit_script(error_msg)
 
     convert(args.start_number, Path(args.source), Path(args.output))
