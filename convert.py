@@ -31,43 +31,49 @@ def make_csv(filename: str, output: Path):
             csv_writer.writerow(row)
 
 
-def copy_and_rename_photo(filename: str, source: Path, output: Path) -> None:
-    picture = next(source.glob("*.jpg"))
+def copy_and_rename_photo(file: Path, filename: str, output: Path) -> None:
     destination = output / f"{filename}.JPG"
-    shutil.copyfile(picture, destination)
+    shutil.copyfile(file, destination)
 
 
-def convert(num: int, source: Path, output: Path, auto_crop: bool) -> None:
-    filename = f"DSCF{num:04d}"
+def convert(num: int, source: Path, output: Path) -> None:
     if not output.exists():
+        print(f"{output} does not exist... creating")
         output.mkdir()
-    copy_and_rename_photo(filename, source, output)
-    make_csv(filename, output)
+    files = list(source.glob("*.jpg"))
+    print(f"Found {len(files)} files to convert")
+    for idx, file in enumerate(files):
+        print(f"\tConverting file {idx+1}/{len(files)}")
+        filename = f"DSCF{num + idx:04d}"
+        copy_and_rename_photo(file, filename, output)
+        make_csv(filename, output)
+    print(f"Converted files saved in {output.absolute()}")
 
 
 def validate_args(args: Namespace) -> str:
     msg = ""
-    if args.number > 9999:
-        msg = "--number can have maximum 4 digits"
+    if args.start_number > 9999:
+        msg = "--start_number can have maximum 4 digits"
     return msg
 
 
 if "__main__" == __name__:
     argparse = ArgumentParser()
     argparse.add_argument(
-        "-n", "--number", required=True, type=int, help="photo number for file names"
+        "-n",
+        "--start_number",
+        required=True,
+        type=int,
+        help="starting photo number for file names",
     )
     argparse.add_argument(
-        "-s", "--source", required=True, help="source folder of photo"
+        "-s", "--source", required=True, help="source folder containing photos"
     )
     argparse.add_argument("-o", "--output", required=True, help="output folder")
-    argparse.add_argument(
-        "-a", "--auto_crop", action="store_true", help="automatically crop input image"
-    )
     args = argparse.parse_args()
 
     error_msg = validate_args(args)
     if error_msg:
         raise TypeError(error_msg)
 
-    convert(args.number, Path(args.source), Path(args.output), args.auto_crop)
+    convert(args.start_number, Path(args.source), Path(args.output))
