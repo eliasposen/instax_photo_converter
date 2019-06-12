@@ -6,10 +6,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
+from cropper import Cropper
 from style_print import red, blue, green, bold, underline
 
 
-class ConvertImages:
+class InstaxConverter:
+    IMAGE_SIZE = (1920, 1920)
+
     def __init__(self, source: str, output: str, start_number: int):
         self.source_dir = Path(source)
         self.output_dir = Path(output)
@@ -71,9 +74,16 @@ class ConvertImages:
         print(bold(f"\nFound {len(pictures)} file(s) to convert"))
         for idx, picture in enumerate(pictures):
             print(f"\tConverting file {idx+1}/{len(pictures)}{'.'*20}", end="")
+
             filename = f"DSCF{self.start_number + idx:04d}"
+            # destination = self.output_dir / f"{filename}.JPG"
+            # cropper = Cropper(
+            #     picture, destination, fixed_size=InstaxConverter.IMAGE_SIZE
+            # )
+            # cropper.launch()
             self.copy_and_rename_picture(picture, filename)
             self.generate_csv(filename)
+
             print(green("DONE"))
         print(
             f"\nConverted picture(s) saved in {underline(self.output_dir.absolute())}"
@@ -111,4 +121,4 @@ if "__main__" == __name__:
     if error_msg:
         exit_script(error_msg)
 
-    ConvertImages(args.source, args.output, args.start_number).convert()
+    InstaxConverter(args.source, args.output, args.start_number).convert()

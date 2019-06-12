@@ -8,29 +8,29 @@ BOLD = "\033[1m"
 UNDERLINE = "\033[4m"
 
 
-def yellow(msg: str, end="\n") -> None:
+def yellow(msg: str) -> None:
     return f"{YELLOW}{msg}{ENDC}"
 
 
-def red(msg: str, end="\n") -> None:
+def red(msg: str) -> None:
     return f"{RED}{msg}{ENDC}"
 
 
-def green(msg: str, end="\n") -> None:
+def green(msg: str) -> None:
     return f"{GREEN}{msg}{ENDC}"
 
 
-def blue(msg: str, end="\n") -> None:
+def blue(msg: str) -> None:
     return f"{BLUE}{msg}{ENDC}"
 
 
-def pink(msg: str, end="\n") -> None:
+def pink(msg: str) -> None:
     return f"{HEADER}{msg}{ENDC}"
 
 
-def underline(msg: str, end="\n") -> None:
+def underline(msg: str) -> None:
     return f"{UNDERLINE}{msg}{ENDC}"
 
 
-def bold(msg: str, end="\n") -> None:
+def bold(msg: str) -> None:
     return f"{BOLD}{msg}{ENDC}"
