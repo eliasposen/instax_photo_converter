@@ -51,18 +51,11 @@ class InstaxConverter:
         Creates required INSTAX SQ10 csv
         """
         filepath = self.output_dir / f"{filename}.CSV"
-        rows = ConvertImages.default_csv()
+        rows = InstaxConverter.default_csv()
         with open(filepath, "w") as csvfile:
             csv_writer = csv.writer(csvfile)
             for row in rows:
                 csv_writer.writerow(row)
-
-    def copy_and_rename_picture(self, picture: Path, filename: str) -> None:
-        """
-        What it says on the tin
-        """
-        destination = self.output_dir / f"{filename}.JPG"
-        shutil.copyfile(picture, destination)
 
     def convert(self) -> None:
         """
@@ -70,18 +63,15 @@ class InstaxConverter:
         format for INSTAX SQ10
         """
         self.check_dirs()
-        pictures = list(self.source_dir.glob("*.jpg"))
-        print(bold(f"\nFound {len(pictures)} file(s) to convert"))
-        for idx, picture in enumerate(pictures):
-            print(f"\tConverting file {idx+1}/{len(pictures)}{'.'*20}", end="")
+        picture_paths = list(self.source_dir.glob("*.jpg"))
+        print(bold(f"\nFound {len(picture_paths)} file(s) to convert"))
+        for idx, picture_path in enumerate(picture_paths):
+            print(f"\tConverting file {idx+1}/{len(picture_paths)}{'.'*20}", end="")
 
             filename = f"DSCF{self.start_number + idx:04d}"
-            # destination = self.output_dir / f"{filename}.JPG"
-            # cropper = Cropper(
-            #     picture, destination, fixed_size=InstaxConverter.IMAGE_SIZE
-            # )
-            # cropper.launch()
-            self.copy_and_rename_picture(picture, filename)
+            destination = self.output_dir / f"{filename}.JPG"
+            cropper = Cropper(picture_path, destination, InstaxConverter.IMAGE_SIZE)
+            cropper.launch()
             self.generate_csv(filename)
 
             print(green("DONE"))
