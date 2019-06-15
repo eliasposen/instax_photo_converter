@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from cropper import Cropper
+from cropper import Cropper, CropImage
 from style_print import red, blue, green, bold, underline
 
 
@@ -16,7 +16,10 @@ class InstaxConverter:
     def __init__(self, source: str, output: str, start_number: int):
         self.source_dir = Path(source)
         self.output_dir = Path(output)
+        self.check_dirs()
+
         self.start_number = start_number
+        self.crop_images = self.generate_crop_images()
 
     @staticmethod
     def default_csv() -> List[List[str]]:
@@ -46,35 +49,43 @@ class InstaxConverter:
             self.output_dir.mkdir()
             print(blue("CREATED"))
 
-    def generate_csv(self, filename: str):
+    def generate_csvs(self):
         """
-        Creates required INSTAX SQ10 csv
+        Creates required INSTAX SQ10 csvs for all given images
         """
-        filepath = self.output_dir / f"{filename}.CSV"
-        rows = InstaxConverter.default_csv()
-        with open(filepath, "w") as csvfile:
-            csv_writer = csv.writer(csvfile)
-            for row in rows:
-                csv_writer.writerow(row)
+        for crop_image in self.crop_images:
+            filename = crop_image.outpath.name.replace(
+                crop_image.outpath.suffix, ".CSV"
+            )
+            filepath = self.output_dir / filename
+            rows = InstaxConverter.default_csv()
+            with open(filepath, "w") as csvfile:
+                csv_writer = csv.writer(csvfile)
+                for row in rows:
+                    csv_writer.writerow(row)
+
+    def generate_crop_images(self) -> List[CropImage]:
+        crop_images = []
+        image_paths = list(self.source_dir.glob("*.jpg"))
+        print(bold(f"\nFound {len(image_paths)} file(s) to convert"))
+        for idx, image_path in enumerate(image_paths):
+            filename = f"DSCF{self.start_number + idx:04d}"
+            outpath = self.output_dir / f"{filename}.JPG"
+            crop_images.append(
+                CropImage(image_path, outpath, InstaxConverter.IMAGE_SIZE)
+            )
+        return crop_images
 
     def convert(self) -> None:
         """
         Converts files in source directory into
         format for INSTAX SQ10
         """
-        self.check_dirs()
-        picture_paths = list(self.source_dir.glob("*.jpg"))
-        print(bold(f"\nFound {len(picture_paths)} file(s) to convert"))
-        for idx, picture_path in enumerate(picture_paths):
-            print(f"\tConverting file {idx+1}/{len(picture_paths)}{'.'*20}", end="")
-
-            filename = f"DSCF{self.start_number + idx:04d}"
-            destination = self.output_dir / f"{filename}.JPG"
-            cropper = Cropper(picture_path, destination, InstaxConverter.IMAGE_SIZE)
-            cropper.launch()
-            self.generate_csv(filename)
-
-            print(green("DONE"))
+        cropper = Cropper(self.crop_images)
+        cropper.launch()
+        self.generate_csvs()
+        # print(f"\tConverting file {idx+1}/{len(picture_paths)}{'.'*20}", end="")
+        # print(green("DONE"))
         print(
             f"\nConverted picture(s) saved in {underline(self.output_dir.absolute())}"
         )
