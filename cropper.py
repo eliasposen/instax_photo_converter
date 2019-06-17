@@ -65,9 +65,9 @@ class CropImage:
     def transpose(self, rotation) -> None:
         self.image = self.image.transpose(rotation)
         self.ui_image = self.ui_image.transpose(rotation)
-        self.resize_ui_crop_box_if_legal(0, 0)
+        self.resize_ui_crop_box(0, 0)
 
-    def move_ui_crop_box_if_legal(self, delta_x: int, delta_y: int) -> None:
+    def move_ui_crop_box(self, delta_x: int, delta_y: int) -> None:
         new_location = [
             self.ui_crop_box_location[0] + delta_x,
             self.ui_crop_box_location[1] + delta_y,
@@ -84,7 +84,7 @@ class CropImage:
 
         self.ui_crop_box_location = (new_location[0], new_location[1])
 
-    def resize_ui_crop_box_if_legal(self, delta_w: int, delta_h: int) -> None:
+    def resize_ui_crop_box(self, delta_w: int, delta_h: int) -> None:
         if self.square_crop:
             if delta_w < 0 or delta_h < 0:
                 delta = min(delta_w, delta_h)
@@ -109,7 +109,7 @@ class CropImage:
 
         self.crop_width = new_width
         self.crop_height = new_height
-        self.move_ui_crop_box_if_legal(0, 0)
+        self.move_ui_crop_box(0, 0)
 
     def get_ui_crop_box_size(self) -> Tuple[int, int]:
         width_percent = self.crop_width / self.image.width
@@ -183,7 +183,7 @@ class Cropper:
     def launch(self) -> None:
         pygame.init()
         with TemporaryDirectory() as tmp_dir:
-            tmp_img_path = Path(tmp_dir) / "tmp.jpg"
+            tmp_img_path = Path(tmp_dir) / "cropper_ui_image.jpg"
             for idx, crop_image in enumerate(self.crop_images):
                 print(f"\tCropping image {idx+1}/{len(self.crop_images)}", end="")
                 crop_image.ui_image.save(tmp_img_path)
@@ -219,23 +219,23 @@ class Cropper:
             for event in pygame.event.get():
                 # Move crop_box
                 if event.type == pygame.KEYDOWN and event.key == K_LEFT:
-                    crop_image.move_ui_crop_box_if_legal(-self.move_delta, 0)
+                    crop_image.move_ui_crop_box(-self.move_delta, 0)
                 if event.type == pygame.KEYDOWN and event.key == K_RIGHT:
-                    crop_image.move_ui_crop_box_if_legal(self.move_delta, 0)
+                    crop_image.move_ui_crop_box(self.move_delta, 0)
                 if event.type == pygame.KEYDOWN and event.key == K_UP:
-                    crop_image.move_ui_crop_box_if_legal(0, -self.move_delta)
+                    crop_image.move_ui_crop_box(0, -self.move_delta)
                 if event.type == pygame.KEYDOWN and event.key == K_DOWN:
-                    crop_image.move_ui_crop_box_if_legal(0, self.move_delta)
+                    crop_image.move_ui_crop_box(0, self.move_delta)
 
                 # Resize crop_box
                 if event.type == pygame.KEYDOWN and event.key == K_w:
-                    crop_image.resize_ui_crop_box_if_legal(self.resize_delta, 0)
+                    crop_image.resize_ui_crop_box(self.resize_delta, 0)
                 if event.type == pygame.KEYDOWN and event.key == K_e:
-                    crop_image.resize_ui_crop_box_if_legal(-self.resize_delta, 0)
+                    crop_image.resize_ui_crop_box(-self.resize_delta, 0)
                 if event.type == pygame.KEYDOWN and event.key == K_h:
-                    crop_image.resize_ui_crop_box_if_legal(0, self.resize_delta)
+                    crop_image.resize_ui_crop_box(0, self.resize_delta)
                 if event.type == pygame.KEYDOWN and event.key == K_j:
-                    crop_image.resize_ui_crop_box_if_legal(0, -self.resize_delta)
+                    crop_image.resize_ui_crop_box(0, -self.resize_delta)
 
                 # Rotate image
                 if event.type == pygame.KEYDOWN and event.key == K_r:
@@ -267,8 +267,8 @@ if "__main__" == __name__:
     img = CropImage(
         Path("test_images/test_crop/crop_me.jpg"),
         Path("test_images/test_crop/cropped.jpg"),
-        crop_size=(100000000, 1000000)
-        # square_crop=True,
+        # crop_size=(100000000, 1000000)
+        square_crop=True,
     )
     c = Cropper(img)
     c.launch()
