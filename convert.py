@@ -71,9 +71,7 @@ class InstaxConverter:
         for idx, image_path in enumerate(image_paths):
             filename = f"DSCF{self.start_number + idx:04d}"
             outpath = self.output_dir / f"{filename}.JPG"
-            crop_images.append(
-                CropImage(image_path, outpath, InstaxConverter.IMAGE_SIZE)
-            )
+            crop_images.append(CropImage(image_path, outpath, square_crop=True))
         return crop_images
 
     def convert(self) -> None:
@@ -84,8 +82,6 @@ class InstaxConverter:
         cropper = Cropper(self.crop_images)
         cropper.launch()
         self.generate_csvs()
-        # print(f"\tConverting file {idx+1}/{len(picture_paths)}{'.'*20}", end="")
-        # print(green("DONE"))
         print(
             f"\nConverted picture(s) saved in {underline(self.output_dir.absolute())}"
         )
