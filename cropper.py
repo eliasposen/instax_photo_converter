@@ -10,6 +10,7 @@ from pygame.locals import (
     K_UP,
     K_DOWN,
     K_RETURN,
+    K_TAB,
     K_e,
     K_j,
     K_r,
@@ -41,6 +42,9 @@ class CropImage:
         self.crop_width, self.crop_height = self.validate_crop_size(crop_size)
 
     def validate_crop_size(self, crop_size: Tuple[int, int]) -> Tuple[int, int]:
+        """
+        Validates crop_size with image size and square_crop
+        """
         if self.square_crop and crop_size:
             raise AttributeError(
                 "CropImage can not be given both crop_size and square_crop"
@@ -200,10 +204,33 @@ class Cropper:
     def draw_crop_box(
         self, surface, size: Tuple[int, int], location: Tuple[int, int] = (0, 0)
     ):
-        crop_box = pygame.Surface(size)
-        crop_box.set_alpha(90)
-        crop_box.fill((255, 255, 255))
-        surface.blit(crop_box, location)
+        # w, h
+        top_bar = {"loc": (0, 0), "size": (surface.get_width(), location[1])}
+        bottom_bar = {
+            "loc": (0, location[1] + size[1]),
+            "size": (
+                surface.get_width(),
+                surface.get_height() - (location[1] + size[1]) + 1,
+            ),
+        }
+        left_bar = {"loc": (0, 0), "size": (location[0], surface.get_height())}
+        right_bar = {
+            "loc": (location[0] + size[0], 0),
+            "size": (
+                surface.get_width() - (location[0] + size[0]) + 1,
+                surface.get_height(),
+            ),
+        }
+
+        for bar in [top_bar, bottom_bar, left_bar, right_bar]:
+            box = pygame.Surface(bar["size"])
+            box.fill((0, 0, 0))
+            surface.blit(box, bar["loc"])
+
+        # crop_box = pygame.Surface(size)
+        # crop_box.set_alpha(90)
+        # crop_box.fill((255, 255, 255))
+        # surface.blit(crop_box, location)
 
     def place_crop_box(
         self, crop_image: CropImage, tmp_path: Path
@@ -250,6 +277,10 @@ class Cropper:
                         surface, crop_box_size, crop_image.ui_crop_box_location
                     )
 
+                # Skip
+                if event.type == pygame.KEYDOWN and event.key == K_TAB:
+                    pygame.quit()
+                    return
                 # Finish cropping
                 if (
                     event.type == pygame.QUIT

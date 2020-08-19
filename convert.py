@@ -67,8 +67,9 @@ class InstaxConverter:
     def generate_crop_images(self) -> List[CropImage]:
         crop_images = []
         image_paths = list(self.source_dir.glob("*.jpg"))
-        print(bold(f"\nFound {len(image_paths)} file(s) to convert"))
+        print(bold(f"\nFound {len(image_paths)} file(s) to convert\nLoading..."))
         for idx, image_path in enumerate(image_paths):
+            # print("∆", end="")
             filename = f"DSCF{self.start_number + idx:04d}"
             outpath = self.output_dir / f"{filename}.JPG"
             crop_images.append(CropImage(image_path, outpath, square_crop=True))
