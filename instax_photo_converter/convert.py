@@ -56,6 +56,14 @@ class InstaxConverter:
             self.output_dir.mkdir()
             print(blue("CREATED"))
 
+    def print_controls(self) -> None:
+        print("\n" + underline("Cropping Controls"))
+        print(
+            "\tMove Crop Box: Arrow Keys\n\tEnlarge Crop "
+            "Box: 'h'\n\tShrink Crop Box: 'j'\n\tRotate Image: 'r'\n\tSubmit: "
+            "Enter\n\tSkip: Tab"
+        )
+
     def generate_csvs(self):
         """
         Creates required INSTAX SQ10 csvs for all given images
@@ -73,7 +81,7 @@ class InstaxConverter:
 
     def generate_crop_images(self) -> List[CropImage]:
         print(bold(f"\nFound {len(self.source_images)} file(s) to convert\nLoading..."))
-
+        self.print_controls()
         crop_images = []
         for idx, image_path in enumerate(self.source_images):
             filename = f"DSCF{self.start_number + idx:04d}"

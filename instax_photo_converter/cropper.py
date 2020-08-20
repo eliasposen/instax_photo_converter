@@ -129,7 +129,6 @@ class CropImage:
         if (
             width <= CropImage.UI_IMAGE_LEN or height <= CropImage.UI_IMAGE_LEN
         ):  # this could cause an issue for "skinny" photos
-            self.image.save(outpath)
             ui_image = self.image.copy()  # TODO: does this work?
         else:
             if width >= height:
