@@ -7,7 +7,9 @@ from typing import List
 import click
 
 from instax_photo_converter.cropper import Cropper, CropImage
-from instax_photo_converter.style_print import red, blue, green, bold, underline
+from instax_photo_converter.style_print import (
+    red, blue, green, bold, underline
+)
 
 
 class InstaxConverter:
@@ -139,24 +141,5 @@ def convert(source: str, output: str, start_number: int):
     """
     InstaxConverter(source, output, start_number).convert()
 
-
-# if "__main__" == __name__:
-#     argparse = ArgumentParser()
-#     argparse.add_argument(
-#         "-n",
-#         "--start_number",
-#         required=True,
-#         type=int,
-#         help="starting photo number for file names",
-#     )
-#     argparse.add_argument(
-#         "-s", "--source", required=True, help="source folder containing photos"
-#     )
-#     argparse.add_argument("-o", "--output", required=True, help="output folder")
-#     args = argparse.parse_args()
-
-#     error_msg = validate_args(args)
-#     if error_msg:
-#         exit_script(error_msg)
-
-#     InstaxConverter(args.source, args.output, args.start_number).convert()
+if "__main__" == __name__:
+    convert()
