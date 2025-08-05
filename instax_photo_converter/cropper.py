@@ -141,7 +141,7 @@ class CropImage:
                 diff = height - CropImage.UI_IMAGE_LEN
                 new_width = int(width - (diff * ratio))
                 new_height = CropImage.UI_IMAGE_LEN
-            ui_image = self.image.resize((new_width, new_height), Image.ANTIALIAS)
+            ui_image = self.image.resize((new_width, new_height))
         return ui_image
 
     def convert_ui_crop_box_location(self) -> Tuple[int, int]:

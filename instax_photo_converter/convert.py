@@ -1,5 +1,4 @@
 import csv
-import shutil
 from datetime import datetime
 from pathlib import Path
 from typing import List
@@ -7,9 +6,7 @@ from typing import List
 import click
 
 from instax_photo_converter.cropper import Cropper, CropImage
-from instax_photo_converter.style_print import (
-    red, blue, green, bold, underline
-)
+from instax_photo_converter.style_print import red, blue, bold, underline
 
 
 class InstaxConverter:
@@ -140,6 +137,7 @@ def convert(source: str, output: str, start_number: int):
     digital polaroid camera.
     """
     InstaxConverter(source, output, start_number).convert()
+
 
 if "__main__" == __name__:
     convert()
